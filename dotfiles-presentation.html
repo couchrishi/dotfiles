@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dotfiles for Claude Code on Vertex AI</title>
+
+    <!-- Fonts: Clash Display (display) + Satoshi (body) from Fontshare -->
+    <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=satoshi@400,500,700&display=swap">
+    <!-- JetBrains Mono for code blocks -->
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===========================================
+           CSS CUSTOM PROPERTIES (NEON CYBER THEME)
+           Change these to reskin the whole presentation
+           =========================================== */
+        :root {
+            /* Colors */
+            --bg-deep: #0a0f1c;
+            --bg-card: #111827;
+            --bg-card-alt: #0f172a;
+            --cyan: #00ffcc;
+            --cyan-dim: rgba(0, 255, 204, 0.15);
+            --cyan-glow: rgba(0, 255, 204, 0.3);
+            --magenta: #ff00aa;
+            --magenta-dim: rgba(255, 0, 170, 0.15);
+            --amber: #ffb800;
+            --red-soft: #ff6b6b;
+            --green-soft: #4ade80;
+            --text-primary: #e0e8f0;
+            --text-secondary: rgba(224, 232, 240, 0.55);
+            --text-dim: rgba(224, 232, 240, 0.35);
+            --border: rgba(255, 255, 255, 0.08);
+            --grid-color: rgba(0, 255, 204, 0.04);
+
+            /* Typography */
+            --font-display: 'Clash Display', sans-serif;
+            --font-body: 'Satoshi', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --title-size: clamp(1.8rem, 5vw, 4rem);
+            --h2-size: clamp(1.4rem, 3.5vw, 2.5rem);
+            --h3-size: clamp(1rem, 2vw, 1.5rem);
+            --body-size: clamp(0.75rem, 1.3vw, 1.05rem);
+            --small-size: clamp(0.6rem, 1vw, 0.8rem);
+            --code-size: clamp(0.6rem, 1.1vw, 0.85rem);
+
+            /* Spacing */
+            --slide-padding: clamp(1.5rem, 4vw, 4rem);
+            --content-gap: clamp(0.8rem, 2vw, 2rem);
+            --element-gap: clamp(0.3rem, 1vw, 0.8rem);
+
+            /* Animation */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration-normal: 0.6s;
+        }
+
+        /* ===========================================
+           RESET
+           =========================================== */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* ===========================================
+           VIEWPORT FITTING: MANDATORY BASE STYLES
+           Include this ENTIRE file in every presentation.
+           These styles ensure slides fit exactly in the viewport.
+           =========================================== */
+        html, body { height: 100%; overflow-x: hidden; }
+        html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+
+        .slide {
+            width: 100vw; height: 100vh; height: 100dvh;
+            overflow: hidden; scroll-snap-align: start;
+            display: flex; flex-direction: column;
+            position: relative;
+        }
+        .slide-content {
+            flex: 1; display: flex; flex-direction: column;
+            justify-content: center; max-height: 100%;
+            overflow: hidden; padding: var(--slide-padding);
+        }
+        .card, .container, .content-box {
+            max-width: min(90vw, 1000px);
+            max-height: min(80vh, 700px);
+        }
+        .feature-list, .bullet-list { gap: clamp(0.4rem, 1vh, 1rem); }
+        .feature-list li, .bullet-list li { font-size: var(--body-size); line-height: 1.4; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+            gap: clamp(0.5rem, 1.5vw, 1rem);
+        }
+        img, .image-container {
+            max-width: 100%; max-height: min(50vh, 400px); object-fit: contain;
+        }
+
+        /* Short viewports */
+        @media (max-height: 700px) {
+            :root {
+                --slide-padding: clamp(0.75rem, 3vw, 2rem);
+                --content-gap: clamp(0.4rem, 1.5vw, 1rem);
+                --title-size: clamp(1.25rem, 4.5vw, 2.5rem);
+                --h2-size: clamp(1rem, 3vw, 1.75rem);
+            }
+        }
+        @media (max-height: 600px) {
+            :root {
+                --slide-padding: clamp(0.5rem, 2.5vw, 1.5rem);
+                --content-gap: clamp(0.3rem, 1vw, 0.75rem);
+                --title-size: clamp(1.1rem, 4vw, 2rem);
+                --body-size: clamp(0.7rem, 1.2vw, 0.95rem);
+            }
+            .nav-dots, .keyboard-hint, .decorative { display: none; }
+        }
+        @media (max-height: 500px) {
+            :root {
+                --slide-padding: clamp(0.4rem, 2vw, 1rem);
+                --title-size: clamp(1rem, 3.5vw, 1.5rem);
+                --h2-size: clamp(0.9rem, 2.5vw, 1.25rem);
+                --body-size: clamp(0.65rem, 1vw, 0.85rem);
+            }
+        }
+        @media (max-width: 600px) {
+            :root { --title-size: clamp(1.25rem, 7vw, 2.5rem); }
+            .grid { grid-template-columns: 1fr; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.2s !important;
+            }
+            html { scroll-behavior: auto; }
+        }
+
+        /* ===========================================
+           GLOBAL PRESENTATION STYLES
+           =========================================== */
+        body {
+            background: var(--bg-deep);
+            font-family: var(--font-body);
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- Progress bar --- */
+        .progress-bar {
+            position: fixed; top: 0; left: 0;
+            height: 3px; background: linear-gradient(90deg, var(--cyan), var(--magenta));
+            z-index: 1000; width: 0%;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px var(--cyan-glow);
+        }
+
+        /* --- Navigation dots --- */
+        .nav-dots {
+            position: fixed; right: clamp(0.8rem, 2vw, 1.5rem);
+            top: 50%; transform: translateY(-50%);
+            display: flex; flex-direction: column; gap: 10px;
+            z-index: 1000;
+        }
+        .nav-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--text-dim); cursor: pointer;
+            transition: all 0.3s ease; border: none;
+            padding: 0;
+        }
+        .nav-dot.active {
+            background: var(--cyan);
+            box-shadow: 0 0 8px var(--cyan-glow);
+            transform: scale(1.3);
+        }
+        .nav-dot:hover { background: var(--text-secondary); }
+
+        /* --- Slide number --- */
+        .slide-number {
+            position: absolute;
+            bottom: clamp(0.8rem, 2vh, 1.5rem);
+            right: clamp(0.8rem, 2vw, 1.5rem);
+            font-family: var(--font-mono);
+            font-size: var(--small-size);
+            color: var(--text-dim);
+            z-index: 5;
+        }
+
+        /* ===========================================
+           BACKGROUNDS & DECORATIVE ELEMENTS
+           =========================================== */
+
+        /* Grid pattern overlay */
+        .grid-bg::before {
+            content: ''; position: absolute; inset: 0;
+            background-image:
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 60px 60px;
+            mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 30%, transparent 70%);
+            pointer-events: none;
+        }
+
+        /* Floating glow orbs */
+        .orb {
+            position: absolute; border-radius: 50%; filter: blur(80px);
+            opacity: 0.3; pointer-events: none;
+            animation: drift 10s ease-in-out infinite;
+        }
+        .orb-cyan { background: var(--cyan); }
+        .orb-magenta { background: var(--magenta); }
+        @keyframes drift {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(20px, -15px) scale(1.05); }
+            66% { transform: translate(-10px, 10px) scale(0.95); }
+        }
+
+        /* ===========================================
+           REVEAL ANIMATIONS
+           =========================================== */
+        .reveal {
+            opacity: 0; transform: translateY(25px);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+        .slide.visible .reveal { opacity: 1; transform: translateY(0); }
+        .slide.visible .reveal:nth-child(1) { transition-delay: 0.05s; }
+        .slide.visible .reveal:nth-child(2) { transition-delay: 0.15s; }
+        .slide.visible .reveal:nth-child(3) { transition-delay: 0.25s; }
+        .slide.visible .reveal:nth-child(4) { transition-delay: 0.35s; }
+        .slide.visible .reveal:nth-child(5) { transition-delay: 0.45s; }
+        .slide.visible .reveal:nth-child(6) { transition-delay: 0.55s; }
+
+        /* ===========================================
+           TYPOGRAPHY
+           =========================================== */
+        h1, h2, h3 {
+            font-family: var(--font-display);
+            font-weight: 600; line-height: 1.1;
+        }
+        h1 { font-size: var(--title-size); }
+        h2 { font-size: var(--h2-size); }
+        h3 { font-size: var(--h3-size); }
+        p { font-size: var(--body-size); line-height: 1.6; color: var(--text-secondary); }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--cyan), var(--magenta));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .tag {
+            display: inline-block;
+            border: 1px solid var(--cyan);
+            color: var(--cyan);
+            padding: 0.25em 0.9em;
+            border-radius: 100px;
+            font-size: var(--small-size);
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            box-shadow: 0 0 12px rgba(0, 255, 204, 0.1);
+        }
+
+        /* ===========================================
+           CODE BLOCKS
+           =========================================== */
+        .code-block {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            font-family: var(--font-mono);
+            font-size: var(--code-size);
+        }
+        .code-titlebar {
+            background: rgba(0,0,0,0.3);
+            padding: clamp(0.3rem, 0.8vh, 0.5rem) clamp(0.6rem, 1.5vw, 1rem);
+            display: flex; align-items: center; gap: 6px;
+            border-bottom: 1px solid var(--border);
+        }
+        .code-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .code-dot-r { background: #ff5f56; }
+        .code-dot-y { background: #ffbd2e; }
+        .code-dot-g { background: #27c93f; }
+        .code-titlebar-text {
+            flex: 1; text-align: center;
+            font-size: var(--small-size);
+            color: var(--text-dim);
+        }
+        .code-body {
+            padding: clamp(0.6rem, 1.5vh, 1rem) clamp(0.8rem, 2vw, 1.2rem);
+        }
+        .code-line {
+            line-height: 1.7;
+            white-space: nowrap;
+        }
+        .c-prompt { color: var(--cyan); }
+        .c-comment { color: var(--text-dim); }
+        .c-string { color: #a5d6ff; }
+        .c-flag { color: #79c0ff; }
+        .c-success { color: var(--green-soft); }
+        .c-warn { color: var(--amber); }
+        .c-key { color: var(--magenta); }
+        .c-val { color: var(--cyan); }
+        .cursor-blink {
+            display: inline-block; width: 8px; height: 1.1em;
+            background: var(--cyan); vertical-align: text-bottom;
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* ===========================================
+           FEATURE CARDS
+           =========================================== */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+            gap: clamp(0.6rem, 1.5vw, 1.2rem);
+        }
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: clamp(0.8rem, 2vh, 1.5rem) clamp(1rem, 2vw, 1.5rem);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .feature-card:hover {
+            border-color: rgba(0, 255, 204, 0.2);
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.05);
+        }
+        .card-icon {
+            font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+            margin-bottom: clamp(0.3rem, 0.8vh, 0.6rem);
+        }
+        .card-title {
+            font-family: var(--font-display);
+            font-size: var(--h3-size);
+            font-weight: 600;
+            margin-bottom: clamp(0.2rem, 0.5vh, 0.4rem);
+        }
+        .card-desc {
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* ===========================================
+           TABLE STYLES
+           =========================================== */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: var(--body-size);
+        }
+        .data-table th, .data-table td {
+            text-align: left;
+            padding: clamp(0.3rem, 0.8vh, 0.6rem) clamp(0.5rem, 1.5vw, 1rem);
+            border-bottom: 1px solid var(--border);
+        }
+        .data-table th {
+            color: var(--cyan);
+            font-family: var(--font-mono);
+            font-size: var(--small-size);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        .data-table td { color: var(--text-secondary); }
+        .data-table code {
+            font-family: var(--font-mono);
+            font-size: var(--small-size);
+            color: var(--cyan);
+            background: var(--cyan-dim);
+            padding: 0.15em 0.4em;
+            border-radius: 4px;
+        }
+
+        /* ===========================================
+           FLOW DIAGRAM
+           =========================================== */
+        .flow-row {
+            display: flex; align-items: center;
+            gap: clamp(0.5rem, 1.5vw, 1rem);
+            flex-wrap: wrap; justify-content: center;
+        }
+        .flow-step {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: clamp(0.5rem, 1.2vh, 0.8rem) clamp(0.8rem, 2vw, 1.2rem);
+            font-size: var(--small-size);
+            text-align: center;
+            min-width: 100px;
+        }
+        .flow-step-label {
+            font-family: var(--font-mono);
+            font-size: clamp(0.5rem, 0.9vw, 0.7rem);
+            color: var(--text-dim);
+            margin-bottom: 0.2em;
+        }
+        .flow-step-name {
+            font-family: var(--font-display);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .flow-arrow {
+            color: var(--cyan);
+            font-size: clamp(0.8rem, 1.5vw, 1.2rem);
+            opacity: 0.5;
+        }
+
+        /* ===========================================
+           SPLIT LAYOUT
+           =========================================== */
+        .split {
+            display: flex; gap: clamp(1rem, 3vw, 3rem);
+            align-items: flex-start;
+            flex: 1;
+        }
+        .split-left, .split-right { flex: 1; min-width: 0; }
+        @media (max-width: 768px) {
+            .split { flex-direction: column; }
+        }
+
+        /* ===========================================
+           LAYER DIAGRAM
+           =========================================== */
+        .layer-stack {
+            display: flex; flex-direction: column;
+            gap: clamp(0.3rem, 0.6vh, 0.5rem);
+        }
+        .layer {
+            display: flex; align-items: center;
+            gap: clamp(0.5rem, 1.5vw, 1rem);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: clamp(0.4rem, 1vh, 0.7rem) clamp(0.8rem, 2vw, 1.2rem);
+            transition: border-color 0.3s;
+        }
+        .layer:hover { border-color: rgba(0, 255, 204, 0.2); }
+        .layer-num {
+            font-family: var(--font-mono);
+            font-size: var(--small-size);
+            color: var(--cyan);
+            font-weight: 700;
+            min-width: 2em;
+        }
+        .layer-name {
+            font-family: var(--font-display);
+            font-weight: 500;
+            font-size: var(--body-size);
+        }
+        .layer-file {
+            font-family: var(--font-mono);
+            font-size: var(--small-size);
+            color: var(--text-dim);
+            margin-left: auto;
+        }
+
+        /* ===========================================
+           BULLET LIST STYLED
+           =========================================== */
+        .neon-list {
+            list-style: none;
+            display: flex; flex-direction: column;
+            gap: clamp(0.3rem, 0.8vh, 0.6rem);
+        }
+        .neon-list li {
+            font-size: var(--body-size);
+            color: var(--text-secondary);
+            padding-left: 1.5em;
+            position: relative; line-height: 1.5;
+        }
+        .neon-list li::before {
+            content: '\25B8'; position: absolute; left: 0;
+            color: var(--cyan);
+        }
+
+        /* ===========================================
+           INLINE EDITING (opt-in)
+           =========================================== */
+        .edit-hotzone {
+            position: fixed; top: 0; left: 0;
+            width: 80px; height: 80px;
+            z-index: 10000; cursor: pointer;
+        }
+        .edit-toggle {
+            position: fixed; top: 12px; left: 12px;
+            background: var(--bg-card); border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 6px 12px; border-radius: 6px;
+            font-family: var(--font-mono); font-size: 12px;
+            cursor: pointer; z-index: 10001;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .edit-toggle.show, .edit-toggle.active { opacity: 1; pointer-events: auto; }
+        .edit-toggle.active { border-color: var(--cyan); color: var(--cyan); }
+        .edit-banner {
+            display: none; position: fixed; top: 0; left: 0; right: 0;
+            background: var(--cyan); color: var(--bg-deep);
+            text-align: center; padding: 4px;
+            font-family: var(--font-mono); font-size: 11px;
+            font-weight: 700; z-index: 9999;
+        }
+        .edit-banner.show { display: block; }
+        [contenteditable="true"] {
+            outline: 2px dashed var(--cyan);
+            outline-offset: 2px;
+            cursor: text;
+        }
+
+        /* ===========================================
+           SLIDE-SPECIFIC STYLES
+           =========================================== */
+
+        /* Title slide - extra dramatic */
+        .title-slide {
+            align-items: center; justify-content: center;
+            text-align: center;
+        }
+        .title-slide .slide-content {
+            align-items: center;
+        }
+
+        /* Closing slide */
+        .closing-slide .slide-content {
+            align-items: center; text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- === PROGRESS BAR === -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- === NAVIGATION DOTS === -->
+    <nav class="nav-dots" id="navDots" aria-label="Slide navigation"></nav>
+
+    <!-- === INLINE EDITING === -->
+    <div class="edit-hotzone" id="editHotzone"></div>
+    <button class="edit-toggle" id="editToggle">Edit Mode</button>
+    <div class="edit-banner" id="editBanner">EDIT MODE - Click text to edit | Ctrl+S to save | Press E to exit</div>
+
+    <!-- ===========================================
+         SLIDE 1: TITLE
+         =========================================== -->
+    <section class="slide title-slide grid-bg" id="slide-1">
+        <div class="orb orb-cyan" style="width:350px;height:350px;top:8%;left:12%"></div>
+        <div class="orb orb-magenta" style="width:280px;height:280px;bottom:12%;right:15%;animation-delay:-4s;animation-direction:reverse"></div>
+        <div class="slide-content">
+            <div class="tag reveal">Developer Workflow</div>
+            <h1 class="reveal" style="margin-top:clamp(0.8rem,2vh,1.5rem)">Dotfiles for<br><span class="gradient-text">Claude Code</span></h1>
+            <p class="reveal" style="max-width:550px;margin-top:clamp(0.5rem,1.5vh,1rem)">Portable dev environments on Vertex AI.<br>GNU Stow, automated hooks, multi-model agents.</p>
+            <div class="reveal" style="margin-top:clamp(1rem,2.5vh,2rem);font-family:var(--font-mono);font-size:var(--code-size);color:var(--cyan);opacity:0.7">
+                $ cc<span class="cursor-blink"></span>
+            </div>
+        </div>
+        <div class="slide-number">01 / 16</div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 2: THE PROBLEM
+         =========================================== -->
+    <section class="slide grid-bg" id="slide-2">
+        <div class="orb orb-magenta" style="width:200px;height:200px;top:15%;right:20%;opacity:0.15"></div>
+        <div class="slide-content">
+            <span class="tag reveal">The Problem</span>
+            <h2 class="reveal" style="margin-top:clamp(0.6rem,1.5vh,1rem)">Every new machine is a <span class="gradient-text">blank slate</span></h2>
+            <ul class="neon-list reveal" style="margin-top:clamp(0.8rem,2vh,1.5rem);max-width:700px">
+                <li>Reinstalling tools, reconfiguring shells, re-setting permissions</li>
+                <li>Claude Code needs Vertex AI env vars, model pinning, hooks, MCP servers</li>
+                <li>No guardrails: AI can push to main, read .env files, run rm -rf</li>
+                <li>Formatters, linters, git aliases all need setup from scratch</li>
+                <li>GCP Cloud Workstations are ephemeral &mdash; config vanishes</li>
+            </ul>
+        </div>
+        <div class="slide-number">02 / 16</div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 3: THE SOLUTION
+         =========================================== -->
+    <section class="slide grid-bg" id="slide-3">
+        <div class="orb orb-cyan" style="width:250px;height:250px;bottom:20%;left:10%;opacity:0.2"></div>
+        <div class="slide-content">
+            <span class="tag reveal">The Solution</span>
+            <h2 class="reveal" style="margin-top:clamp(0.6rem,1.5vh,1rem)">One repo. Two commands. <span class="gradient-text">Done.</span></h2>
+            <div class="code-block reveal" style="margin-top:clamp(0.8rem,2vh,1.5rem);max-width:600px">
+                <div class="code-titlebar">
+                    <div class="code-dot code-dot-r"></div>
+                    <div class="code-dot code-dot-y"></div>
+                    <div class="code-dot code-dot-g"></div>
+                    <div class="code-titlebar-text">terminal</div>
+                </div>
+                <div class="code-body">
+                    <div class="code-line"><span class="c-comment"># Fresh machine? Two commands:</span></div>
+                    <div class="code-line"><span class="c-prompt">$</span> git clone dotfiles.git ~/dotfiles</div>
+                    <div class="code-line"><span class="c-prompt">$</span> cd ~/dotfiles && ./install.sh</div>
+                    <div class="code-line" style="margin-top:0.5em"><span class="c-success">&#10003; Symlinks created. Hooks active.</span></div>
+                    <div class="code-line"><span class="c-success">&#10003; Vertex AI configured.</span></div>
+                    <div class="code-line"><span class="c-success">&#10003; Formatters ready.</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="slide-number">03 / 16</div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 4: ARCHITECTURE OVERVIEW
+         =========================================== -->
+    <section class="slide grid-bg" id="slide-4">
+        <div class="slide-content">
+            <span class="tag reveal">Architecture</span>
+            <h2 class="reveal" style="margin-top:clamp(0.5rem,1.2vh,0.8rem)">Three Stow Packages</h2>
+            <p class="reveal" style="margin-top:clamp(0.3rem,0.8vh,0.5rem)">Each directory maps to <code style="color:var(--cyan);font-family:var(--font-mono)">~/</code> via GNU Stow symlinks.</p>
+            <div class="cards-grid reveal" style="margin-top:clamp(0.8rem,2vh,1.5rem)">
+                <div class="feature-card">
+                    <div class="card-icon">&#9881;</div>
+                    <div class="card-title">claude/</div>
+                    <div class="card-desc">settings.json, CLAUDE.md, slash commands, sub-agents, MCP servers</div>
+                </div>
+                <div class="feature-card">
+                    <div class="card-icon">&#9002;</div>
+                    <div class="card-title">shell/</div>
+                    <div class="card-desc">.bashrc, .zshrc, .bash_claude with Vertex AI env vars &amp; aliases</div>
+                </div>
+                <div class="feature-card">
+                    <div class="card-icon">&#9733;</div>
+                    <div class="card-title">git/</div>
+                    <div class="card-desc">.gitconfig with identity, rebase-on-pull, branch defaults, aliases</div>
+                </div>
+            </div>
+            <p class="reveal" style="margin-top:clamp(0.6rem,1.5vh,1rem);font-family:var(--font-mono);font-size:var(--small-size);color:var(--text-dim)">
+                stow claude &rarr; ~/dotfiles/claude/.claude/settings.json appears at ~/.claude/settings.json
+            </p>
+        </div>
+        <div class="slide-number">04 / 16</div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 5: SETUP FLOW
+         =========================================== -->
+    <section class="slide grid-bg" id="slide-5">
+        <div class="orb orb-cyan" style="width:180px;height:180px;top:10%;right:25%;opacity:0.12"></div>
+        <div class="slide-content">
+            <span class="tag reveal">Setup Flow</span>
+            <h2 class="reveal" style="margin-top:clamp(0.5rem,1.2vh,0.8rem)">Two-Phase Bootstrap</h2>
+            <div class="flow-row reveal" style="margin-top:clamp(1rem,2.5vh,2rem)">
+                <div class="flow-step" style="border-color:var(--cyan)">
+                    <div class="flow-step-label">Phase 1</div>
+                    <div class="flow-step-name" style="color:var(--cyan)">bootstrap.sh</div>
+                </div>
+                <div class="flow-arrow">&rarr;</div>
+                <div class="flow-step">
+                    <div class="flow-step-label">Installs</div>
+                    <div class="flow-step-name">11 prerequisites</div>
+                </div>
+                <div class="flow-arrow">&rarr;</div>
+                <div class="flow-step" style="border-color:var(--magenta)">
+                    <div class="flow-step-label">Phase 2</div>
+                    <div class="flow-step-name" style="color:var(--magenta)">install.sh</div>
+                </div>
+                <div class="flow-arrow">&rarr;</div>
+                <div class="flow-step">
+                    <div class="flow-step-label">Creates</div>
+                    <div class="flow-step-name">Symlinks + skills</div>
+                </div>
+            </div>
+            <div class="split reveal" style="margin-top:clamp(0.8rem,2vh,1.5rem)">
+                <div class="split-left">
+                    <h3 style="color:var(--cyan);margin-bottom:clamp(0.3rem,0.6vh,0.5rem)">bootstrap.sh</h3>
+                    <ul class="neon-list">
+                        <li>Detects macOS / Linux / GCP</li>
+                        <li>Installs git, stow, claude, gh</li>
+                        <li>Installs gcloud, node, python, uv</li>
+                        <li>Installs jq, gemini CLI</li>
+                    </ul>
+                </div>
+                <div class="split-right">
+                    <h3 style="color:var(--magenta);margin-bottom:clamp(0.3rem,0.6vh,0.5rem)">install.sh</h3>
+                    <ul class="neon-list">
+                        <li>Backs up existing dotfiles</li>
+                        <li>Stows claude, shell, git</li>
+                        <li>Installs ADK + Office skills</li>
+                        <li>Verifies Vertex AI &amp; formatters</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="slide-number">05 / 16</div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 6: VERTEX AI CONFIGURATION
+         =========================================== -->
+    <section class="slide grid-bg" id="slide-6">
+        <div class="orb orb-magenta" style="width:200px;height:200px;bottom:15%;left:8%;opacity:0.15"></div>
+        <div class="slide-content">
+            <span class="tag reveal">Vertex AI</span>
+            <h2 class="reveal" style="margin-top:clamp(0.5rem,1.2vh,0.8rem)">No API Keys. <span class="gradient-text">Just gcloud.</span></h2>
+            <div class="code-block reveal" style="margin-top:clamp(0.8rem,2vh,1.2rem);max-width:650px">
+                <div class="code-titlebar">
+                    <div class="code-dot code-dot-r"></div>
+                    <div class="code-dot code-dot-y"></div>
+                    <div class="code-dot code-dot-g"></div>
+                    <div class="code-titlebar-text">.bash_claude</div>
+                </div>
+                <div class="code-body">
+                    <div class="code-line"><span class="c-comment"># Use Vertex AI backend (ADC auth)</span></div>
+                    <div class="code-line"><span class="c-key">export</span> <span class="c-val">CLAUDE_CODE_USE_VERTEX</span>=1</div>
+                    <div class="code-line"><span class="c-key">export</span> <span class="c-val">CLOUD_ML_REGION</span>=global</div>
+                    <div class="code-line" style="margin-top:0.4em"><span class="c-comment"># Pin model versions for stability</span></div>
+                    <div class="code-line"><span class="c-key">export</span> <span class="c-val">ANTHROPIC_MODEL</span>=<span class="c-string">"claude-opus-4-6"</span></div>
+                    <div class="code-line"><span class="c-key">export</span> <span class="c-val">ANTHROPIC_DEFAULT_SONNET_MODEL</span>=<span class="c-string">"claude-sonnet-4-6"</span></div>
+                    <div class="code-line"><span class="c-key">export</span> <span class="c-val">ANTHROPIC_DEFAULT_HAIKU_MODEL</span>=<span class="c-string">"claude-haiku-4-5@20251001"</span></div>
+                </div>
+            </div>
+            <p class="reveal" style="margin-top:clamp(0.5rem,1.2vh,0.8rem);max-width:600px">
+                Model pinning prevents breakage when new versions ship on Vertex. No API keys ever touch disk &mdash; gcloud ADC handles auth.
+            </p>
+        </div>
+        <div class="slide-number">06 / 16</div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 7: PERMISSIONS
+         =========================================== -->
+    <section class="slide grid-bg" id="slide-7">
+        <div class="slide-content">
+            <span class="tag reveal">Permissions</span>
+            <h2 class="reveal" style="margin-top:clamp(0.5rem,1.2vh,0.8rem)">Allow What's Needed. <span class="gradient-text">Deny What's Dangerous.</span></h2>
+            <div class="split reveal" style="margin-top:clamp(0.8rem,2vh,1.2rem)">
+                <div class="split-left">
+                    <h3 style="color:var(--green-soft);margin-bottom:clamp(0.3rem,0.6vh,0.5rem)">Allow</h3>
+                    <ul class="neon-list">
+                        <li style="color:var(--green-soft)">File ops: Read, Write, Edit, Glob, Grep</li>
+                        <li style="color:var(--green-soft)">Dev tools: git, npm, python, go, make</li>
+                        <li style="color:var(--green-soft)">Cloud: gcloud, docker, terraform</li>
+                        <li style="color:var(--green-soft)">Utilities: jq, curl, grep, sort</li>
+                    </ul>
+                </div>
+                <div class="split-right">
+                    <h3 style="color:var(--red-soft);margin-bottom:clamp(0.3rem,0.6vh,0.5rem)">Deny</h3>
+                    <ul class="neon-list">
+                        <li style="color:var(--red-soft)">Read .env, credentials, secrets, .pem</li>
+                        <li style="color:var(--red-soft)">Read id_rsa (SSH keys)</li>
+                        <li style="color:var(--red-soft)">Write to .env or credentials</li>
+                        <li style="color:var(--red-soft)">rm -rf, sudo, chmod 777</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="reveal" style="margin-top:clamp(0.6rem,1.5vh,1rem);font-size:var(--small-size);color:var(--text-dim)">
+                Defined in settings.json &mdash; enforced at the tool level before commands run
+            </p>
+        </div>
+        <div class="slide-number">07 / 16</div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 8: HOOKS
+         =========================================== -->
+    <section class="slide grid-bg" id="slide-8">
+        <div class="orb orb-cyan" style="width:220px;height:220px;top:15%;left:60%;opacity:0.12"></div>
+        <div class="slide-content">
+            <span class="tag reveal">Hooks</span>
+            <h2 class="reveal" style="margin-top:clamp(0.5rem,1.2vh,0.8rem)">Automated Guardrails</h2>
+            <div class="cards-grid reveal" style="margin-top:clamp(0.8rem,2vh,1.5rem);grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))">
+                <div class="feature-card" style="border-left:3px solid var(--red-soft)">
+                    <div class="card-title" style="color:var(--red-soft)">PreToolUse: Block Push to Main</div>
+                    <div class="card-desc" style="margin-top:0.4em">Intercepts every Bash command. If it matches <code style="color:var(--red-soft);font-family:var(--font-mono);font-size:var(--small-size)">git push.*main|master</code>, it exits with an error and tells Claude to use a feature branch.</div>
+                </div>
+                <div class="feature-card" style="border-left:3px solid var(--green-soft)">
+                    <div class="card-title" style="color:var(--green-soft)">PostToolUse: Auto-Format</div>
+                    <div class="card-desc" style="margin-top:0.4em">After every file edit, runs the right formatter: <code style="color:var(--green-soft);font-family:var(--font-mono);font-size:var(--small-size)">prettier</code> for JS/TS/CSS, <code style="color:var(--green-soft);font-family:var(--font-mono);font-size:var(--small-size)">black</code> for Python, <code style="color:var(--green-soft);font-family:var(--font-mono);font-size:var(--small-size)">gofmt</code> for Go, <code style="color:var(--green-soft);font-family:var(--font-mono);font-size:var(--small-size)">terraform fmt</code> for TF.</div>
+                </div>
+            </div>
+            <p class="reveal" style="margin-top:clamp(0.6rem,1.5vh,1rem);font-size:var(--small-size);color:var(--text-dim)">
+                Hooks are deterministic and 100% enforced &mdash; unlike CLAUDE.md instructions, they can't be ignored
+            </p>
+        </div>
+        <div class="slide-number">08 / 16</div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 9: CLAUDE.MD
+         =========================================== -->
+    <section class="slide grid-bg" id="slide-9">
+        <div class="slide-content">
+            <span class="tag reveal">AI Instructions</span>
+            <h2 class="reveal" style="margin-top:clamp(0.5rem,1.2vh,0.8rem)">CLAUDE.md &mdash; <span class="gradient-text">The System Prompt</span></h2>
+            <p class="reveal" style="margin-top:clamp(0.3rem,0.8vh,0.5rem)">Loaded every session. Short, opinionated, non-negotiable.</p>
+            <div class="cards-grid reveal" style="margin-top:clamp(0.8rem,1.5vh,1.2rem);grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr))">
+                <div class="feature-card">
+                    <div class="card-title">Behavior</div>
+                    <div class="card-desc">Be direct. Plan before coding. Prefer simple solutions. Admit uncertainty.</div>
+                </div>
+                <div class="feature-card">
+                    <div class="card-title">Code Style</div>
+                    <div class="card-desc">Explicit over clever. Meaningful names. Handle errors &mdash; no silent failures.</div>
+                </div>
+                <div class="feature-card">
+                    <div class="card-title">Git &amp; GitHub</div>
+                    <div class="card-desc">Use gh CLI. Conventional commits. Never commit to main.</div>
+                </div>
+                <div class="feature-card">
+                    <div class="card-title">GCP / Cloud</div>
+                    <div class="card-desc">Use gcloud CLI. Never hardcode secrets. Use Secret Manager.</div>
+                </div>
+            </div>
+        </div>
+        <div class="slide-number">09 / 16</div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 10: SLASH COMMANDS
+         =========================================== -->
+    <section class="slide grid-bg" id="slide-10">
+        <div class="orb orb-magenta" style="width:180px;height:180px;top:60%;right:10%;opacity:0.12"></div>
+        <div class="slide-content">
+            <span class="tag reveal">Slash Commands</span>
+            <h2 class="reveal" style="margin-top:clamp(0.5rem,1.2vh,0.8rem)">Custom Workflows</h2>
+            <div class="split reveal" style="margin-top:clamp(0.8rem,2vh,1.5rem)">
+                <div class="split-left">
+                    <div class="code-block">
+                        <div class="code-titlebar">
+                            <div class="code-dot code-dot-r"></div>
+                            <div class="code-dot code-dot-y"></div>
+                            <div class="code-dot code-dot-g"></div>
+                            <div class="code-titlebar-text">/plan</div>
+                        </div>
+                        <div class="code-body">
+                            <div class="code-line"><span class="c-comment"># Forces structured planning</span></div>
+                            <div class="code-line">1. Restate the goal</div>
+                            <div class="code-line">2. List files to change</div>
+                            <div class="code-line">3. Flag risks</div>
+                            <div class="code-line">4. Wait for approval</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="split-right">
+                    <div class="code-block">
+                        <div class="code-titlebar">
+                            <div class="code-dot code-dot-r"></div>
+                            <div class="code-dot code-dot-y"></div>
+                            <div class="code-dot code-dot-g"></div>
+                            <div class="code-titlebar-text">/review</div>
+                        </div>
+                        <div class="code-body">
+                            <div class="code-line"><span class="c-comment"># Structured code review</span></div>
+                            <div class="code-line"><span class="c-flag">Correctness</span> - bugs, edge cases</div>
+                            <div class="code-line"><span class="c-flag">Security</span> - secrets, injection</div>
+                            <div class="code-line"><span class="c-flag">Performance</span> - N+1, blocking</div>
+                            <div class="code-line"><span class="c-flag">Readability</span> - future devs</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p class="reveal" style="margin-top:clamp(0.5rem,1.2vh,0.8rem);font-size:var(--small-size);color:var(--text-dim)">
+                Add your own: create a .md file in ~/.claude/commands/ &mdash; it becomes a /slash command
+            </p>
+        </div>
+        <div class="slide-number">10 / 16</div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 11: GEMINI SUB-AGENT
+         =========================================== -->
+    <section class="slide grid-bg" id="slide-11">
+        <div class="orb orb-cyan" style="width:250px;height:250px;bottom:20%;left:5%;opacity:0.15"></div>
+        <div class="slide-content">
+            <span class="tag reveal">Multi-Model</span>
+            <h2 class="reveal" style="margin-top:clamp(0.5rem,1.2vh,0.8rem)">Gemini Sub-Agent</h2>
+            <p class="reveal" style="margin-top:clamp(0.3rem,0.8vh,0.5rem)">Delegate full-codebase analysis to Gemini's 1M-token context window.</p>
+            <div class="code-block reveal" style="margin-top:clamp(0.8rem,2vh,1.2rem);max-width:650px">
+                <div class="code-titlebar">
+                    <div class="code-dot code-dot-r"></div>
+                    <div class="code-dot code-dot-y"></div>
+                    <div class="code-dot code-dot-g"></div>
+                    <div class="code-titlebar-text">inside Claude Code</div>
+                </div>
+                <div class="code-body">
+                    <div class="code-line"><span class="c-comment"># Ask Gemini for architecture review</span></div>
+                    <div class="code-line"><span class="c-prompt">&gt;</span> @gemini analyze the architecture of this project</div>
+                    <div class="code-line" style="margin-top:0.3em"><span class="c-comment"># Under the hood:</span></div>
+                    <div class="code-line"><span class="c-success">gemini --all-files -p "Analyze the architecture..."</span></div>
+                </div>
+            </div>
+            <ul class="neon-list reveal" style="margin-top:clamp(0.6rem,1.5vh,1rem)">
+                <li>Security reviews across entire codebases</li>
+                <li>Pattern detection and dependency audits</li>
+                <li>Second opinion on Claude's own code</li>
+            </ul>
+        </div>
+        <div class="slide-number">11 / 16</div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 12: MCP SERVERS
+         =========================================== -->
+    <section class="slide grid-bg" id="slide-12">
+        <div class="slide-content">
+            <span class="tag reveal">MCP</span>
+            <h2 class="reveal" style="margin-top:clamp(0.5rem,1.2vh,0.8rem)">External Knowledge via <span class="gradient-text">MCP Servers</span></h2>
+            <div class="code-block reveal" style="margin-top:clamp(0.8rem,2vh,1.5rem);max-width:580px">
+                <div class="code-titlebar">
+                    <div class="code-dot code-dot-r"></div>
+                    <div class="code-dot code-dot-y"></div>
+                    <div class="code-dot code-dot-g"></div>
+                    <div class="code-titlebar-text">.mcp.json</div>
+                </div>
+                <div class="code-body">
+                    <div class="code-line">{</div>
+                    <div class="code-line">&nbsp;&nbsp;<span class="c-key">"mcpServers"</span>: {</div>
+                    <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-key">"adk-docs"</span>: {</div>
+                    <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-key">"command"</span>: <span class="c-string">"uvx"</span>,</div>
+                    <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-key">"args"</span>: [<span class="c-string">"--from"</span>, <span class="c-string">"mcpdoc"</span>, ...]</div>
+                    <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;}</div>
+                    <div class="code-line">&nbsp;&nbsp;}</div>
+                    <div class="code-line">}</div>
+                </div>
+            </div>
+            <p class="reveal" style="margin-top:clamp(0.6rem,1.5vh,1rem);max-width:550px">
+                Claude queries the ADK docs server on demand &mdash; no context pollution, no web searches needed.
+            </p>
+        </div>
+        <div class="slide-number">12 / 16</div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 13: SHELL ALIASES
+         =========================================== -->
+    <section class="slide grid-bg" id="slide-13">
+        <div class="orb orb-magenta" style="width:160px;height:160px;top:20%;left:70%;opacity:0.1"></div>
+        <div class="slide-content">
+            <span class="tag reveal">Ergonomics</span>
+            <h2 class="reveal" style="margin-top:clamp(0.5rem,1.2vh,0.8rem)">Aliases &amp; Helpers</h2>
+            <div style="overflow-x:auto">
+                <table class="data-table reveal" style="margin-top:clamp(0.8rem,2vh,1.5rem);max-width:650px">
+                    <thead>
+                        <tr><th>Alias</th><th>Command</th><th>Purpose</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><code>cc</code></td><td>claude --dangerously-skip-permissions</td><td>Start session</td></tr>
+                        <tr><td><code>ccc</code></td><td>claude --continue</td><td>Continue last session</td></tr>
+                        <tr><td><code>ccr</code></td><td>claude --resume</td><td>Resume specific session</td></tr>
+                        <tr><td><code>ccp</code></td><td>claude -p</td><td>One-shot / scripting</td></tr>
+                        <tr><td><code>claude-info</code></td><td>function</td><td>Show Vertex AI config</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="reveal" style="margin-top:clamp(0.5rem,1.2vh,0.8rem);font-size:var(--small-size);color:var(--text-dim)">
+                Shared between bash and zsh via .bash_claude &mdash; sourced by both shells
+            </p>
+        </div>
+        <div class="slide-number">13 / 16</div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 14: SECURITY MODEL
+         =========================================== -->
+    <section class="slide grid-bg" id="slide-14">
+        <div class="slide-content">
+            <span class="tag reveal">Security</span>
+            <h2 class="reveal" style="margin-top:clamp(0.5rem,1.2vh,0.8rem)">Defense in Depth</h2>
+            <div class="layer-stack reveal" style="margin-top:clamp(0.8rem,2vh,1.5rem);max-width:700px">
+                <div class="layer">
+                    <span class="layer-num">01</span>
+                    <span class="layer-name">.gitignore</span>
+                    <span class="layer-file">Prevents secrets from entering version control</span>
+                </div>
+                <div class="layer">
+                    <span class="layer-num">02</span>
+                    <span class="layer-name">Deny rules</span>
+                    <span class="layer-file">Blocks reading .env, credentials, keys at runtime</span>
+                </div>
+                <div class="layer">
+                    <span class="layer-num">03</span>
+                    <span class="layer-name">Allow list</span>
+                    <span class="layer-file">Principle of least privilege for bash commands</span>
+                </div>
+                <div class="layer">
+                    <span class="layer-num">04</span>
+                    <span class="layer-name">PreToolUse hooks</span>
+                    <span class="layer-file">Enforce workflow (no push to main)</span>
+                </div>
+                <div class="layer">
+                    <span class="layer-num">05</span>
+                    <span class="layer-name">CLAUDE.md</span>
+                    <span class="layer-file">Soft guidance: never hardcode secrets</span>
+                </div>
+            </div>
+        </div>
+        <div class="slide-number">14 / 16</div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 15: EXTENSIBILITY
+         =========================================== -->
+    <section class="slide grid-bg" id="slide-15">
+        <div class="orb orb-cyan" style="width:200px;height:200px;top:50%;right:8%;opacity:0.12"></div>
+        <div class="slide-content">
+            <span class="tag reveal">Extend</span>
+            <h2 class="reveal" style="margin-top:clamp(0.5rem,1.2vh,0.8rem)">Make It <span class="gradient-text">Yours</span></h2>
+            <div class="cards-grid reveal" style="margin-top:clamp(0.8rem,2vh,1.5rem);grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr))">
+                <div class="feature-card">
+                    <div class="card-title">Skills</div>
+                    <div class="card-desc">npx skills add ... or create ~/.claude/skills/my-skill/SKILL.md</div>
+                </div>
+                <div class="feature-card">
+                    <div class="card-title">Commands</div>
+                    <div class="card-desc">Drop a .md file in ~/.claude/commands/ &mdash; instant /slash command</div>
+                </div>
+                <div class="feature-card">
+                    <div class="card-title">Agents</div>
+                    <div class="card-desc">Create ~/.claude/agents/my-agent.md with tools and instructions</div>
+                </div>
+                <div class="feature-card">
+                    <div class="card-title">Local Overrides</div>
+                    <div class="card-desc">.bashrc.local for machine-specific config (gitignored)</div>
+                </div>
+            </div>
+            <p class="reveal" style="margin-top:clamp(0.5rem,1.2vh,0.8rem);font-size:var(--small-size);color:var(--text-dim)">
+                Project-level .claude/settings.json overrides global &mdash; stack configs per repo
+            </p>
+        </div>
+        <div class="slide-number">15 / 16</div>
+    </section>
+
+    <!-- ===========================================
+         SLIDE 16: CLOSING
+         =========================================== -->
+    <section class="slide closing-slide grid-bg" id="slide-16">
+        <div class="orb orb-cyan" style="width:300px;height:300px;top:15%;left:20%;opacity:0.25"></div>
+        <div class="orb orb-magenta" style="width:250px;height:250px;bottom:15%;right:20%;opacity:0.2;animation-delay:-5s"></div>
+        <div class="slide-content">
+            <span class="tag reveal">Get Started</span>
+            <h2 class="reveal" style="margin-top:clamp(0.6rem,1.5vh,1rem)">Clone. Install. <span class="gradient-text">Ship.</span></h2>
+            <div class="code-block reveal" style="margin-top:clamp(1rem,2.5vh,2rem);max-width:520px;text-align:left">
+                <div class="code-titlebar">
+                    <div class="code-dot code-dot-r"></div>
+                    <div class="code-dot code-dot-y"></div>
+                    <div class="code-dot code-dot-g"></div>
+                    <div class="code-titlebar-text">your terminal</div>
+                </div>
+                <div class="code-body">
+                    <div class="code-line"><span class="c-prompt">$</span> git clone <span class="c-string">your-dotfiles</span> ~/dotfiles</div>
+                    <div class="code-line"><span class="c-prompt">$</span> cd ~/dotfiles && ./install.sh</div>
+                    <div class="code-line"><span class="c-prompt">$</span> source ~/.bashrc</div>
+                    <div class="code-line"><span class="c-prompt">$</span> cc <span class="c-comment"># you're live</span><span class="cursor-blink" style="margin-left:4px"></span></div>
+                </div>
+            </div>
+            <p class="reveal" style="margin-top:clamp(0.8rem,2vh,1.5rem);font-size:var(--small-size);color:var(--text-dim)">
+                Fork it. Customize it. Make it yours.
+            </p>
+        </div>
+        <div class="slide-number">16 / 16</div>
+    </section>
+
+    <!-- ===========================================
+       JAVASCRIPT: PRESENTATION CONTROLLER
+       =========================================== -->
+    <script>
+        class SlidePresentation {
+            constructor() {
+                this.slides = document.querySelectorAll('.slide');
+                this.currentSlide = 0;
+                this.isScrolling = false;
+
+                this.setupIntersectionObserver();
+                this.setupKeyboardNav();
+                this.setupTouchNav();
+                this.setupProgressBar();
+                this.setupNavDots();
+            }
+
+            /* --- Intersection Observer: triggers .visible class --- */
+            setupIntersectionObserver() {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                            // Update current slide index
+                            const idx = Array.from(this.slides).indexOf(entry.target);
+                            if (idx !== -1) {
+                                this.currentSlide = idx;
+                                this.updateProgressBar();
+                                this.updateNavDots();
+                            }
+                        }
+                    });
+                }, { threshold: 0.5 });
+
+                this.slides.forEach(slide => observer.observe(slide));
+            }
+
+            /* --- Keyboard navigation --- */
+            setupKeyboardNav() {
+                document.addEventListener('keydown', (e) => {
+                    // Skip if user is editing text
+                    if (e.target.getAttribute('contenteditable') === 'true') return;
+
+                    switch(e.key) {
+                        case 'ArrowDown':
+                        case 'ArrowRight':
+                        case ' ':
+                        case 'PageDown':
+                            e.preventDefault();
+                            this.goToSlide(Math.min(this.currentSlide + 1, this.slides.length - 1));
+                            break;
+                        case 'ArrowUp':
+                        case 'ArrowLeft':
+                        case 'PageUp':
+                            e.preventDefault();
+                            this.goToSlide(Math.max(this.currentSlide - 1, 0));
+                            break;
+                        case 'Home':
+                            e.preventDefault();
+                            this.goToSlide(0);
+                            break;
+                        case 'End':
+                            e.preventDefault();
+                            this.goToSlide(this.slides.length - 1);
+                            break;
+                    }
+                });
+            }
+
+            /* --- Touch/swipe navigation --- */
+            setupTouchNav() {
+                let touchStartY = 0;
+                document.addEventListener('touchstart', (e) => {
+                    touchStartY = e.touches[0].clientY;
+                }, { passive: true });
+
+                document.addEventListener('touchend', (e) => {
+                    const deltaY = touchStartY - e.changedTouches[0].clientY;
+                    if (Math.abs(deltaY) > 50) {
+                        if (deltaY > 0) {
+                            this.goToSlide(Math.min(this.currentSlide + 1, this.slides.length - 1));
+                        } else {
+                            this.goToSlide(Math.max(this.currentSlide - 1, 0));
+                        }
+                    }
+                }, { passive: true });
+            }
+
+            /* --- Progress bar --- */
+            setupProgressBar() {
+                this.progressBar = document.getElementById('progressBar');
+                this.updateProgressBar();
+            }
+
+            updateProgressBar() {
+                if (this.progressBar) {
+                    const progress = ((this.currentSlide + 1) / this.slides.length) * 100;
+                    this.progressBar.style.width = progress + '%';
+                }
+            }
+
+            /* --- Navigation dots --- */
+            setupNavDots() {
+                const nav = document.getElementById('navDots');
+                if (!nav) return;
+
+                this.slides.forEach((_, i) => {
+                    const dot = document.createElement('button');
+                    dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+                    dot.setAttribute('aria-label', `Go to slide ${i + 1}`);
+                    dot.addEventListener('click', () => this.goToSlide(i));
+                    nav.appendChild(dot);
+                });
+            }
+
+            updateNavDots() {
+                const dots = document.querySelectorAll('.nav-dot');
+                dots.forEach((dot, i) => {
+                    dot.classList.toggle('active', i === this.currentSlide);
+                });
+            }
+
+            /* --- Navigate to slide --- */
+            goToSlide(index) {
+                if (index >= 0 && index < this.slides.length) {
+                    this.slides[index].scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        }
+
+        /* ===========================================
+           INLINE EDITING CONTROLLER
+           =========================================== */
+        class InlineEditor {
+            constructor() {
+                this.isActive = false;
+                this.editToggle = document.getElementById('editToggle');
+                this.editBanner = document.getElementById('editBanner');
+                this.editHotzone = document.getElementById('editHotzone');
+                this.editableSelectors = 'h1, h2, h3, p, li, .card-title, .card-desc, .code-line, td, .tag, .flow-step-name, .layer-name, .layer-file';
+
+                this.setupHotzone();
+                this.setupKeyboard();
+                this.loadSavedEdits();
+            }
+
+            setupHotzone() {
+                let hideTimeout = null;
+                const show = () => { clearTimeout(hideTimeout); this.editToggle.classList.add('show'); };
+                const hide = () => { hideTimeout = setTimeout(() => { if (!this.isActive) this.editToggle.classList.remove('show'); }, 400); };
+
+                this.editHotzone.addEventListener('mouseenter', show);
+                this.editHotzone.addEventListener('mouseleave', hide);
+                this.editToggle.addEventListener('mouseenter', show);
+                this.editToggle.addEventListener('mouseleave', hide);
+                this.editHotzone.addEventListener('click', () => this.toggleEditMode());
+                this.editToggle.addEventListener('click', () => this.toggleEditMode());
+            }
+
+            setupKeyboard() {
+                document.addEventListener('keydown', (e) => {
+                    if ((e.key === 'e' || e.key === 'E') && !e.target.getAttribute('contenteditable')) {
+                        this.toggleEditMode();
+                    }
+                    // Ctrl+S to save
+                    if (e.key === 's' && (e.ctrlKey || e.metaKey) && this.isActive) {
+                        e.preventDefault();
+                        this.saveEdits();
+                    }
+                });
+            }
+
+            toggleEditMode() {
+                this.isActive = !this.isActive;
+                this.editToggle.classList.toggle('active', this.isActive);
+                this.editBanner.classList.toggle('show', this.isActive);
+
+                document.querySelectorAll(this.editableSelectors).forEach(el => {
+                    el.contentEditable = this.isActive ? 'true' : 'false';
+                    if (!this.isActive) el.removeAttribute('contenteditable');
+                });
+
+                if (!this.isActive) this.saveEdits();
+            }
+
+            saveEdits() {
+                const data = {};
+                document.querySelectorAll(this.editableSelectors).forEach((el, i) => {
+                    data[`el-${i}`] = el.innerHTML;
+                });
+                localStorage.setItem('dotfiles-presentation-edits', JSON.stringify(data));
+            }
+
+            loadSavedEdits() {
+                try {
+                    const data = JSON.parse(localStorage.getItem('dotfiles-presentation-edits'));
+                    if (data) {
+                        document.querySelectorAll(this.editableSelectors).forEach((el, i) => {
+                            if (data[`el-${i}`]) el.innerHTML = data[`el-${i}`];
+                        });
+                    }
+                } catch (e) { /* No saved edits */ }
+            }
+        }
+
+        /* --- Initialize --- */
+        const presentation = new SlidePresentation();
+        const editor = new InlineEditor();
+    </script>
+</body>
+</html>

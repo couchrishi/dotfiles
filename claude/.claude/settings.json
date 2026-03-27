@@ -1,0 +1,75 @@
+{
+  "env": {
+    "ENABLE_LSP_TOOL": "1"
+  },
+  "permissions": {
+    "allow": [
+      "Read",
+      "Edit",
+      "MultiEdit",
+      "Write",
+      "Glob",
+      "Grep",
+      "LS",
+      "Bash(git *)",
+      "Bash(npm *)",
+      "Bash(npx *)",
+      "Bash(node *)",
+      "Bash(python *)",
+      "Bash(pip *)",
+      "Bash(go *)",
+      "Bash(make *)",
+      "Bash(cat *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(wc *)",
+      "Bash(find *)",
+      "Bash(grep *)",
+      "Bash(sort *)",
+      "Bash(uniq *)",
+      "Bash(jq *)",
+      "Bash(curl *)",
+      "Bash(gcloud *)",
+      "Bash(docker *)",
+      "Bash(terraform *)",
+      "WebFetch",
+      "WebSearch"
+    ],
+    "deny": [
+      "Read(.env*)",
+      "Read(*credentials*)",
+      "Read(*secret*)",
+      "Read(*.pem)",
+      "Read(*id_rsa*)",
+      "Write(.env*)",
+      "Write(*credentials*)",
+      "Bash(rm -rf *)",
+      "Bash(sudo *)",
+      "Bash(chmod 777 *)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'CMD=$(cat - | jq -r .tool_input.command); if echo \"$CMD\" | grep -qE \"^git push.*(main|master)\"; then echo \"ERROR: Direct push to main/master blocked. Use a feature branch and PR instead.\" >&2; exit 2; fi'"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'FILE=$(cat - | jq -r .tool_input.file_path // .tool_input.path // empty); if [ -n \"$FILE\" ]; then case \"$FILE\" in *.js|*.jsx|*.ts|*.tsx|*.json|*.css|*.md|*.html|*.yaml|*.yml) npx --yes prettier --write \"$FILE\" 2>/dev/null || true ;; *.py) python -m black \"$FILE\" 2>/dev/null || python -m autopep8 --in-place \"$FILE\" 2>/dev/null || true ;; *.go) gofmt -w \"$FILE\" 2>/dev/null || true ;; *.tf) terraform fmt \"$FILE\" 2>/dev/null || true ;; esac; fi'"
+          }
+        ]
+      }
+    ]
+  }
+}

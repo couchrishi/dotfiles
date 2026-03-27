@@ -1,0 +1,15 @@
+# Machine-specific overrides (never commit)
+shell/.bashrc.local
+shell/.zshrc.local
+claude/.claude/settings.local.json
+
+# Secrets
+*.pem
+*.key
+*credentials*
+*secret*
+.env*
+
+# OS junk
+.DS_Store
+Thumbs.db

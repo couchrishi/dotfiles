@@ -1,0 +1,24 @@
+[user]
+    # ⬇️  CHANGE THESE
+    name = couchrishi
+    email = saibalaji@outlook.com
+
+[init]
+    defaultBranch = main
+
+[pull]
+    rebase = true
+
+[push]
+    autoSetupRemote = true
+
+[core]
+    editor = vim
+    autocrlf = input
+
+[alias]
+    co = checkout
+    br = branch
+    ci = commit
+    st = status
+    lg = log --oneline --graph --decorate -20

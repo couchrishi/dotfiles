@@ -1,0 +1,51 @@
+# ============================================================================
+# Claude Code + Vertex AI — shell configuration
+# Loaded by ~/.bashrc (stowed from dotfiles/shell/.bashrc)
+# ============================================================================
+
+# --- Vertex AI Configuration ---
+# These tell Claude Code to use Vertex AI instead of direct Anthropic API.
+# No API key needed — uses gcloud ADC (Application Default Credentials).
+
+export CLAUDE_CODE_USE_VERTEX=1
+export CLOUD_ML_REGION=global
+# ⬇️  CHANGE THIS to your GCP project ID
+export ANTHROPIC_VERTEX_PROJECT_ID="saib-ai-playground"
+
+# --- Pin model versions (recommended for stability) ---
+# Prevents breakage when Anthropic releases new models on Vertex.
+# Check Model Garden for latest available versions.
+export ANTHROPIC_MODEL="claude-opus-4-6"
+export ANTHROPIC_DEFAULT_OPUS_MODEL="claude-opus-4-6"
+export ANTHROPIC_DEFAULT_SONNET_MODEL="claude-sonnet-4-6"
+export ANTHROPIC_DEFAULT_HAIKU_MODEL="claude-haiku-4-5@20251001"
+
+# --- Region overrides (uncomment if a model isn't available on global) ---
+# export VERTEX_REGION_CLAUDE_HAIKU_4_5=us-east5
+# export VERTEX_REGION_CLAUDE_SONNET_4_6=us-east5
+
+# --- Effort level ---
+export CLAUDE_CODE_EFFORT_LEVEL="auto"
+
+# --- LSP (belt-and-suspenders: also set in settings.json) ---
+export ENABLE_LSP_TOOL=1
+
+# --- Claude Code aliases ---
+alias cc="claude --dangerously-skip-permissions"
+alias ccc="claude --continue"
+alias ccr="claude --resume"
+alias ccp="claude -p"          # print mode (one-shot, great for scripting)
+
+# --- Convenience: show current Vertex config ---
+claude-info() {
+    echo "Claude Code — Vertex AI Config"
+    echo "  Project:  ${ANTHROPIC_VERTEX_PROJECT_ID:-NOT SET}"
+    echo "  Region:   ${CLOUD_ML_REGION:-NOT SET}"
+    echo "  Model:    ${ANTHROPIC_MODEL:-default}"
+    echo "  Effort:   ${CLAUDE_CODE_EFFORT_LEVEL:-default}"
+    echo ""
+    if command -v gcloud &>/dev/null; then
+        echo "  GCP user: $(gcloud config get-value account 2>/dev/null)"
+        echo "  Project:  $(gcloud config get-value project 2>/dev/null)"
+    fi
+}

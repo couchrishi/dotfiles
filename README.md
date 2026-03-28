@@ -65,7 +65,9 @@ git clone https://github.com/couchrishi/dotfiles.git ~/dotfiles
 
 # Copy keys BEFORE install (so install.sh detects them and copies local.template)
 mkdir -p ~/.config/gcloud/keys
-# Copy your .json service account key files here
+nano ~/.config/gcloud/keys/saib-ai-playground-sa.json       # paste your key
+nano ~/.config/gcloud/keys/vital-octagon-19612.json         # paste your key
+chmod 600 ~/.config/gcloud/keys/*.json
 
 # Install (detects keys, copies local.template → ~/.zshrc.local, installs skills)
 cd ~/dotfiles && ./install.sh
@@ -99,7 +101,9 @@ git clone https://github.com/couchrishi/dotfiles.git ~/dotfiles
 
 # Copy keys BEFORE install (so install.sh detects them and copies local.template)
 mkdir -p ~/.config/gcloud/keys
-# Copy your .json service account key files here
+nano ~/.config/gcloud/keys/saib-ai-playground-sa.json       # paste your key
+nano ~/.config/gcloud/keys/vital-octagon-19612.json         # paste your key
+chmod 600 ~/.config/gcloud/keys/*.json
 
 # Install (detects keys, copies local.template → ~/.bashrc.local, installs skills)
 cd ~/dotfiles && ./install.sh

@@ -60,15 +60,19 @@ gh repo create dotfiles --private --source=. --push
 # Install prerequisites
 curl -fsSL https://raw.githubusercontent.com/couchrishi/dotfiles/main/bootstrap.sh | bash
 
-# Clone and install
+# Clone
 git clone https://github.com/couchrishi/dotfiles.git ~/dotfiles
-cd ~/dotfiles && ./install.sh
 
-# Copy keys
+# Copy keys BEFORE install (so install.sh detects them and copies local.template)
 mkdir -p ~/.config/gcloud/keys
 # Copy your .json service account key files here
 
-# Edit local overrides — add GEMINI_API_KEY and GITHUB_PAT
+# Install (detects keys, copies local.template → ~/.zshrc.local, installs skills)
+cd ~/dotfiles && ./install.sh
+
+# Edit local overrides — only two secrets to fill in:
+#   GEMINI_API_KEY="your-gemini-api-key-here"  →  your real key
+#   GITHUB_PAT="your-github-pat-here"          →  your real PAT
 nano ~/.zshrc.local
 
 # Source and verify
@@ -90,19 +94,33 @@ cc
 # Install prerequisites
 curl -fsSL https://raw.githubusercontent.com/couchrishi/dotfiles/main/bootstrap.sh | bash
 
-# Clone and install
+# Clone
 git clone https://github.com/couchrishi/dotfiles.git ~/dotfiles
-cd ~/dotfiles && ./install.sh
 
-# Copy keys
+# Copy keys BEFORE install (so install.sh detects them and copies local.template)
 mkdir -p ~/.config/gcloud/keys
 # Copy your .json service account key files here
 
-# Edit local overrides — add GEMINI_API_KEY and GITHUB_PAT
+# Install (detects keys, copies local.template → ~/.bashrc.local, installs skills)
+cd ~/dotfiles && ./install.sh
+
+# Edit local overrides — only two secrets to fill in:
+#   GEMINI_API_KEY="your-gemini-api-key-here"  →  your real key
+#   GITHUB_PAT="your-github-pat-here"          →  your real PAT
 nano ~/.bashrc.local
 
 # Source and verify
 source ~/.bashrc
+claude-info
+gcp-switch saib
+claude-info
+gcp-switch vital
+claude-info
+gcp-switch saib
+
+# Launch
+cc
+```
 claude-info
 gcp-switch saib
 claude-info

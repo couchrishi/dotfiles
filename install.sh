@@ -86,7 +86,19 @@ else
     echo "   ⚠️  npx not found — install Node.js, then run install.sh again"
 fi
 
-# --- 6. Verify Vertex AI setup ---
+# --- 6. Install LSP plugins ---
+echo ""
+echo "📦 Installing LSP plugins..."
+if has claude; then
+    claude plugin install pyright-lsp@claude-plugins-official 2>/dev/null && \
+        echo "   ✅ Python LSP (pyright)" || echo "   ⚠️  pyright LSP failed"
+    claude plugin install typescript-lsp@claude-plugins-official 2>/dev/null && \
+        echo "   ✅ TypeScript LSP" || echo "   ⚠️  typescript LSP failed"
+else
+    echo "   ⚠️  Claude Code not found — install LSP plugins manually"
+fi
+
+# --- 7. Verify Vertex AI setup ---
 echo ""
 echo "🔍 Checking GCP / Vertex AI..."
 
@@ -100,12 +112,12 @@ else
     echo "   ⚠️  gcloud not found. Run bootstrap.sh or install manually."
 fi
 
-# --- 7. Check MCP server dependencies ---
+# --- 8. Check MCP server dependencies ---
 echo ""
 echo "🔍 Checking MCP server dependencies..."
 has uvx && echo "   ✅ uvx (for adk-docs MCP server)" || echo "   ⚠️  uvx not found. Run: curl -LsSf https://astral.sh/uv/install.sh | sh"
 
-# --- 8. Check Gemini CLI ---
+# --- 9. Check Gemini CLI ---
 echo ""
 echo "🔍 Checking Gemini CLI (sub-agent)..."
 if has gemini; then
@@ -116,7 +128,7 @@ else
     echo "   ⚠️  Gemini CLI not found. Run bootstrap.sh or: npm install -g @google/gemini-cli"
 fi
 
-# --- 8. Check formatters (used by auto-format hook) ---
+# --- 10. Check formatters (used by auto-format hook) ---
 echo ""
 echo "🔍 Checking formatters..."
 has npx                                          && echo "   ✅ prettier (via npx)"
@@ -124,7 +136,7 @@ python3 -m black --version &>/dev/null 2>&1      && echo "   ✅ black" || echo 
 has gofmt                                        && echo "   ✅ gofmt"
 has terraform                                    && echo "   ✅ terraform fmt"
 
-# --- 9. Set up local overrides (service account keys, project switcher) ---
+# --- 11. Set up local overrides (service account keys, project switcher) ---
 echo ""
 SHELL_NAME=$(basename "$SHELL")
 if [ "$SHELL_NAME" = "zsh" ]; then
@@ -156,7 +168,7 @@ else
     echo "🔑 Local overrides: $LOCAL_FILE already exists (skipping)"
 fi
 
-# --- 10. Summary ---
+# --- 12. Summary ---
 echo ""
 echo "============================================"
 echo "✅ Dotfiles installed!"

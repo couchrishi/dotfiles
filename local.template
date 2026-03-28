@@ -1,0 +1,51 @@
+# --- GCP Service Account Switcher ---
+_gcp_activate() {
+    local key="$1" project="$2" account="$3"
+    export GOOGLE_APPLICATION_CREDENTIALS="$HOME/.config/gcloud/keys/$key"
+    export ANTHROPIC_VERTEX_PROJECT_ID="$project"
+    gcloud auth activate-service-account "$account" \
+        --key-file="$HOME/.config/gcloud/keys/$key" \
+        --project="$project"
+    gcloud config set project "$project"
+    echo "→ $project ($account)"
+}
+
+gcp-switch() {
+    case "$1" in
+        saib|playground)
+            _gcp_activate "saib-ai-playground-sa.json" \
+                "saib-ai-playground" \
+                "saib-ai-playground-sa@saib-ai-playground.iam.gserviceaccount.com"
+            ;;
+        vital|octagon)
+            _gcp_activate "vital-octagon-19612.json" \
+                "vital-octagon-19612" \
+                "saib-sa-vital@vital-octagon-19612.iam.gserviceaccount.com"
+            ;;
+        *)
+            echo "Usage: gcp-switch [saib|vital]"
+            echo ""
+            echo "Current:"
+            echo "  Project: $ANTHROPIC_VERTEX_PROJECT_ID"
+            echo "  Key:     $(basename "$GOOGLE_APPLICATION_CREDENTIALS" 2>/dev/null)"
+            ;;
+    esac
+}
+
+# Default on shell start
+_gcp_activate "saib-ai-playground-sa.json" \
+    "saib-ai-playground" \
+    "saib-ai-playground-sa@saib-ai-playground.iam.gserviceaccount.com"
+
+
+# Gemini
+export GEMINI_API_KEY=<GEMINI_API_KEY>
+
+#Github
+export GITHUB_PAT=<GITHUB_PAT>
+export GH_TOKEN="$GITHUB_PAT"
+
+
+#Context7
+export CONTEXT7_API_KEY=<CONTEXT7_API_KEY>
+

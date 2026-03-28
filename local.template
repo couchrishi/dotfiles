@@ -3,6 +3,7 @@ _gcp_activate() {
     local key="$1" project="$2" account="$3"
     export GOOGLE_APPLICATION_CREDENTIALS="$HOME/.config/gcloud/keys/$key"
     export ANTHROPIC_VERTEX_PROJECT_ID="$project"
+    gcloud auth revoke "$account" 2>/dev/null || true
     gcloud auth activate-service-account "$account" \
         --key-file="$HOME/.config/gcloud/keys/$key" \
         --project="$project"

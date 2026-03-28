@@ -124,25 +124,50 @@ python3 -m black --version &>/dev/null 2>&1      && echo "   ✅ black" || echo 
 has gofmt                                        && echo "   ✅ gofmt"
 has terraform                                    && echo "   ✅ terraform fmt"
 
-# --- 9. Summary ---
+# --- 9. Set up local overrides (service account keys, project switcher) ---
+echo ""
+SHELL_NAME=$(basename "$SHELL")
+if [ "$SHELL_NAME" = "zsh" ]; then
+    LOCAL_FILE="$HOME/.zshrc.local"
+    SHELL_RC="~/.zshrc"
+else
+    LOCAL_FILE="$HOME/.bashrc.local"
+    SHELL_RC="~/.bashrc"
+fi
+
+if [ ! -f "$LOCAL_FILE" ]; then
+    echo "🔑 Setting up local overrides..."
+    if [ -d "$HOME/.config/gcloud/keys" ] && ls "$HOME/.config/gcloud/keys"/*.json &>/dev/null; then
+        echo "   Found key files in ~/.config/gcloud/keys/:"
+        ls "$HOME/.config/gcloud/keys"/*.json | while read f; do echo "     $(basename "$f")"; done
+        echo ""
+        echo "   Copying template → $LOCAL_FILE"
+        cp "$DOTFILES_DIR/local.template" "$LOCAL_FILE"
+        echo "   ⚠️  Edit $LOCAL_FILE to match your key filenames and project IDs"
+    else
+        echo "   No key files found in ~/.config/gcloud/keys/"
+        echo "   To set up service account auth:"
+        echo "     1. mkdir -p ~/.config/gcloud/keys"
+        echo "     2. Copy your .json key files there"
+        echo "     3. cp $DOTFILES_DIR/local.template $LOCAL_FILE"
+        echo "     4. Edit $LOCAL_FILE with your actual values"
+    fi
+else
+    echo "🔑 Local overrides: $LOCAL_FILE already exists (skipping)"
+fi
+
+# --- 10. Summary ---
 echo ""
 echo "============================================"
 echo "✅ Dotfiles installed!"
 echo "============================================"
 echo ""
-echo "Immediate next steps:"
-echo "  source ~/.bashrc"
+echo "Next steps:"
+echo "  source $SHELL_RC"
 echo "  claude-info                  # verify Vertex AI config"
+echo "  cc                           # start Claude Code"
 echo ""
-echo "First-time auth (if needed):"
-echo "  gcloud auth login"
-echo "  gcloud auth application-default login"
-echo "  gh auth login"
-echo ""
-echo "Inside Claude Code — install LSP plugins:"
+echo "Inside Claude Code — install LSP plugins (one-time):"
 echo "  /plugin install pyright-lsp@claude-plugins-official"
 echo "  /plugin install typescript-lsp@claude-plugins-official"
 echo "  /plugin install gopls-lsp@claude-plugins-official"
-echo ""
-echo "⚠️  IMPORTANT: Edit ~/.bash_claude and set your GCP project ID:"
-echo "  export ANTHROPIC_VERTEX_PROJECT_ID=\"your-actual-project-id\""

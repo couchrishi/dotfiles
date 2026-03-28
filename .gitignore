@@ -13,3 +13,5 @@ claude/.claude/settings.local.json
 # OS junk
 .DS_Store
 Thumbs.db
+*-sa.json
+vital-octagon-*.json

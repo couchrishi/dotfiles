@@ -1,0 +1,9 @@
+# Credentials and secrets
+*.pem
+*.key
+**/keys/*.json
+*credentials*.json
+*secret*
+.env*
+*id_rsa*
+*sa.json

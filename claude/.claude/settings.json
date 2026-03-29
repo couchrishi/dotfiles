@@ -41,8 +41,11 @@
       "Read(*secret*)",
       "Read(*.pem)",
       "Read(*id_rsa*)",
+      "Read(**/keys/*.json)",
+      "Read(*sa.json)",
       "Write(.env*)",
       "Write(*credentials*)",
+      "Write(**/keys/*.json)",
       "Bash(rm -rf *)",
       "Bash(sudo *)",
       "Bash(chmod 777 *)"
@@ -71,6 +74,18 @@
         ]
       }
     ]
+  },
+  "enabledPlugins": {
+    "pyright-lsp@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "claude-plugins-official": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
+      }
+    }
   },
   "skipDangerousModePermissionPrompt": true
 }

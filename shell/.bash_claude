@@ -3,6 +3,9 @@
 # Loaded by ~/.bashrc (stowed from dotfiles/shell/.bashrc)
 # ============================================================================
 
+# --- Ensure ~/.local/bin is in PATH (claude, uv, etc. install here) ---
+export PATH="$HOME/.local/bin:$PATH"
+
 # --- Vertex AI Configuration ---
 # These tell Claude Code to use Vertex AI instead of direct Anthropic API.
 # No API key needed — uses gcloud ADC (Application Default Credentials).

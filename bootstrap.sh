@@ -16,6 +16,9 @@ set -euo pipefail
 
 echo "🔧 Bootstrap: detecting platform..."
 
+# Ensure ~/.local/bin is in PATH (many tools install here: claude, uv, etc.)
+export PATH="$HOME/.local/bin:$PATH"
+
 OS="$(uname -s)"
 ARCH="$(uname -m)"
 
@@ -82,8 +85,6 @@ echo "   ✅ git $(git --version | awk '{print $3}')"
 if ! has claude; then
     echo "📦 Installing Claude Code (native installer)..."
     curl -fsSL https://claude.ai/install.sh | bash
-    # Source updated PATH
-    export PATH="$HOME/.claude/bin:$PATH"
 fi
 if has claude; then
     echo "   ✅ claude $(claude --version 2>/dev/null || echo '(installed)')"
@@ -192,7 +193,6 @@ fi
 if ! has uv; then
     echo "📦 Installing uv..."
     curl -LsSf https://astral.sh/uv/install.sh | sh
-    export PATH="$HOME/.local/bin:$PATH"
 fi
 if has uv; then
     echo "   ✅ uv $(uv --version 2>/dev/null | awk '{print $2}')"

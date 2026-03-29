@@ -13,6 +13,9 @@ DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
 OS="$(uname -s)"
 echo "📂 Dotfiles: $DOTFILES_DIR ($OS)"
 
+# Ensure ~/.local/bin is in PATH (claude, uv, etc. install here)
+export PATH="$HOME/.local/bin:$PATH"
+
 has() { command -v "$1" &>/dev/null; }
 
 # --- 1. Check critical prerequisites ---

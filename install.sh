@@ -90,6 +90,7 @@ fi
 echo ""
 echo "📦 Installing LSP plugins..."
 if has claude; then
+    claude plugin marketplace add anthropics/claude-plugins-official 2>/dev/null || true
     claude plugin install pyright-lsp@claude-plugins-official 2>/dev/null && \
         echo "   ✅ Python LSP (pyright)" || echo "   ⚠️  pyright LSP failed"
     claude plugin install typescript-lsp@claude-plugins-official 2>/dev/null && \
@@ -97,6 +98,7 @@ if has claude; then
 else
     echo "   ⚠️  Claude Code not found — install LSP plugins manually"
 fi
+
 
 # --- 7. Verify Vertex AI setup ---
 echo ""
